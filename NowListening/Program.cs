@@ -1,103 +1,166 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Text;
+using Newtonsoft.Json;
+using NowListening.Data;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 
-string loginCookiesPath =
+var loginCookiesPath =
     Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "loginCookies.json");
+
+var nowListening = "";
+var previousSong = "";
 
 var driverService = ChromeDriverService.CreateDefaultService();
 driverService.HideCommandPromptWindow = true;
 
-
-var chromeOptions = new ChromeOptions { AcceptInsecureCertificates = true };
-
-chromeOptions.AddExcludedArgument("enable-automation");
-
-chromeOptions.AddAdditionalOption("useAutomationExtension", false);
-
-chromeOptions.PageLoadStrategy = PageLoadStrategy.Default;
+var chromeOptions = new ChromeOptions {AcceptInsecureCertificates = true};
 
 var driver = new ChromeDriver(driverService, chromeOptions)
-    { Url = "https://www.instagram.com/iamhacioglu/" };
+    {Url = "https://www.instagram.com/accounts/edit/"};
 
-var allCookies = GetCookie("iamhacioglu");
+var allCookies = GetCookie("cookieInstagram");
 
-foreach (var cookie in allCookies)
-{
-    driver.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain,
-        cookie.Path, new DateTime(ticks: cookie.Expiry)));
-}
+if (allCookies != null)
+    foreach (var cookie in allCookies)
+        driver.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain,
+            cookie.Path, new DateTime(cookie.Expiry)));
+
 driver.Navigate().Refresh();
+
+chromeOptions.AddArgument("--remote-debugging-port=9222");
+chromeOptions.AddArgument(@"--user-data-dir=selenium");
+var driverYoutubeChecker = new ChromeDriver(driverService, chromeOptions)
+    {Url = "https://music.youtube.com/history"};
+
+allCookies = GetCookie("cookieYoutube");
+
+if (allCookies != null)
+    foreach (var cookie in allCookies)
+        driverYoutubeChecker.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain,
+            cookie.Path, new DateTime(cookie.Expiry)));
+
+driverYoutubeChecker.Navigate().Refresh();
 
 while (true)
 {
     try
     {
-        IWebElement profileIcon = null;
-        IWebElement profileEdit = null;
-        try
-        {
-            profileIcon =
-                driver.FindElement(
-                    By.XPath("/html/body/div[1]/section/main/section/div[3]/div[1]/div/div/div[2]/div[1]/div/div/a"));
-        }
-        catch (Exception e)
-        {
-            profileEdit =
-                driver.FindElement(By.XPath("/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/a"));
-        }
-        
-        if (profileIcon != null || profileEdit != null)
-        {
-            var cookie = driver.Manage().Cookies.GetCookieNamed("sessionid");
+        var a = new Thread(UpdateLiveSong);
+        a.Start();
 
-            if (!string.IsNullOrEmpty(cookie?.Value))
-            {
-                StoreCookie(new Tuple<string, List<Cookie>>("iamhacioglu",
-                    new List<Cookie>(driver.Manage().Cookies.AllCookies)));
-            }
-            
-            profileIcon?.Click();
-
-            Thread.Sleep(5000);
-            profileEdit =
-                driver.FindElement(By.XPath("/html/body/div[1]/section/main/div/header/section/div[1]/div[1]/div/a"));
-
-            if (profileEdit != null)
-            {
-                profileEdit.Click();
-                Thread.Sleep(5000);
-
-                while (true)
-                {
-                    var description =
-                        driver.FindElement(
-                            By.XPath("/html/body/div[1]/section/main/div/article/form/div[4]/div/textarea"));
-
-                    if (description != null)
-                    {
-                        var currentText = description.Text;
-
-                        description.Clear();
-                        description.SendKeys("asdasdas");
-                        break;
-                    }
-                }
-
-                break;
-            }
-        }
+        var b = new Thread(CheckCurrentSong);
+        b.Start();
     }
     catch (Exception e)
     {
         Console.WriteLine(e);
+    }
+
+    Console.ReadLine();
+}
+
+void CheckCurrentSong()
+{
+    while (true)
+    {
+        try
+        {
+            var cookie = driver.Manage().Cookies.GetCookieNamed("SSID");
+
+            if (!string.IsNullOrEmpty(cookie?.Value))
+                StoreCookie(new Tuple<string, List<Cookie>>("cookieYoutube",
+                    new List<Cookie>(driver.Manage().Cookies.AllCookies)));
+
+            IWebElement songName = null;
+
+            try
+            {
+                songName = driverYoutubeChecker.FindElement(By.XPath(
+                    "/html/body/ytmusic-app/ytmusic-app-layout/div[3]/ytmusic-browse-response/ytmusic-section-list-renderer/div[2]/ytmusic-shelf-renderer[1]/div[2]/ytmusic-responsive-list-item-renderer[1]/div[2]/div[1]/yt-formatted-string/a"));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
+            IWebElement singer = null;
+
+            try
+            {
+                singer = driverYoutubeChecker.FindElement(By.XPath(
+                    "/html/body/ytmusic-app/ytmusic-app-layout/div[3]/ytmusic-browse-response/ytmusic-section-list-renderer/div[2]/ytmusic-shelf-renderer[1]/div[2]/ytmusic-responsive-list-item-renderer[1]/div[2]/div[3]/yt-formatted-string[1]/a"));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+
+            try
+            {
+                singer = driverYoutubeChecker.FindElement(By.XPath(
+                    "/html/body/ytmusic-app/ytmusic-app-layout/div[3]/ytmusic-browse-response/ytmusic-section-list-renderer/div[2]/ytmusic-shelf-renderer[1]/div[2]/ytmusic-responsive-list-item-renderer[1]/div[2]/div[3]/yt-formatted-string[1]"));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
+            if (!string.IsNullOrEmpty(songName?.Text) && !string.IsNullOrEmpty(singer?.Text))
+            {
+                nowListening = songName?.Text + " - " + singer?.Text.Replace(Environment.NewLine, " ");
+                driverYoutubeChecker.Navigate().Refresh();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        Thread.Sleep(10000);
+    }
+}
+
+void UpdateLiveSong()
+{
+    while (true)
+    {
+        try
+        {
+            var description =
+                driver.FindElement(
+                    By.XPath("/html/body/div[1]/section/main/div/article/form/div[4]/div/textarea"));
+
+            if (description != null)
+            {
+                var cookie = driver.Manage().Cookies.GetCookieNamed("sessionid");
+
+                if (!string.IsNullOrEmpty(cookie?.Value))
+                    StoreCookie(new Tuple<string, List<Cookie>>("cookieInstagram",
+                        new List<Cookie>(driver.Manage().Cookies.AllCookies)));
+
+                previousSong = description.Text;
+
+                if (previousSong == nowListening)
+                {
+                    continue;
+                }
+
+                description.Clear();
+                description.SendKeys(nowListening);
+
+                var submit =
+                    driver.FindElement(
+                        By.XPath("/html/body/div[1]/section/main/div/article/form/div[10]/div/div/button"));
+
+                submit.Click();
+            }
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+        }
+
+        Thread.Sleep(10000);
     }
 }
 
@@ -106,9 +169,8 @@ void StoreCookie(Tuple<string, List<Cookie>> cookie)
     var myCookie = new List<MyCookie>();
 
     foreach (var item in cookie.Item2)
-    {
         if (item.Expiry != null)
-            myCookie.Add(new MyCookie()
+            myCookie.Add(new MyCookie
             {
                 Domain = item.Domain,
                 Expiry = item.Expiry.Value.Ticks,
@@ -119,8 +181,7 @@ void StoreCookie(Tuple<string, List<Cookie>> cookie)
                 Secure = item.Secure
             });
         else
-        {
-            myCookie.Add(new MyCookie()
+            myCookie.Add(new MyCookie
             {
                 Domain = item.Domain,
                 Expiry = DateTime.MaxValue.Ticks,
@@ -130,55 +191,36 @@ void StoreCookie(Tuple<string, List<Cookie>> cookie)
                 Value = item.Value,
                 Secure = item.Secure
             });
-        }
-    }
 
 
     if (!File.Exists(loginCookiesPath))
     {
-        var item = new Dictionary<string, List<MyCookie>> { { cookie.Item1, myCookie } };
-        File.WriteAllText(loginCookiesPath, Newtonsoft.Json.JsonConvert.SerializeObject(item), Encoding.UTF8);
+        var item = new Dictionary<string, List<MyCookie>> {{cookie.Item1, myCookie}};
+        File.WriteAllText(loginCookiesPath, JsonConvert.SerializeObject(item), Encoding.UTF8);
         return;
     }
 
-    string readCookiesJson = File.ReadAllText(loginCookiesPath);
+    var readCookiesJson = File.ReadAllText(loginCookiesPath);
     var readCookies =
-        Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, List<MyCookie>>>(readCookiesJson);
+        JsonConvert.DeserializeObject<Dictionary<string, List<MyCookie>>>(readCookiesJson);
 
     readCookies.TryGetValue(cookie.Item1, out var value);
 
     if (value?.Count > 0)
-    {
         readCookies[cookie.Item1] = myCookie;
-    }
     else
         readCookies.Add(cookie.Item1, myCookie);
-
-
-    File.WriteAllText(loginCookiesPath, Newtonsoft.Json.JsonConvert.SerializeObject(readCookies), Encoding.UTF8);
+    
+    File.WriteAllText(loginCookiesPath, JsonConvert.SerializeObject(readCookies), Encoding.UTF8);
 }
 
 List<MyCookie> GetCookie(string username)
 {
-    if (!File.Exists(loginCookiesPath))
-    {
-        return new List<MyCookie>();
-    }
+    if (!File.Exists(loginCookiesPath)) return new List<MyCookie>();
 
-    string readCookiesJson = File.ReadAllText(loginCookiesPath);
+    var readCookiesJson = File.ReadAllText(loginCookiesPath);
     var readCookies =
-        Newtonsoft.Json.JsonConvert.DeserializeObject<Dictionary<string, List<MyCookie>>>(readCookiesJson);
+        JsonConvert.DeserializeObject<Dictionary<string, List<MyCookie>>>(readCookiesJson);
 
     return readCookies.FirstOrDefault(x => x.Key == username).Value;
-}
-
-public class MyCookie
-{
-    public bool Secure { get; set; }
-    public bool HttpOnly { get; set; }
-    public string Name { get; set; }
-    public string Value { get; set; }
-    public string Domain { get; set; }
-    public string Path { get; set; }
-    public long Expiry { get; set; }
 }
