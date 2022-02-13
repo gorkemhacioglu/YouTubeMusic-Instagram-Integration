@@ -1,5 +1,5 @@
 # YouTubeMusic-Instagram-Integration
-What I'm listening tool for Instagram. AKA YouTube Music - Instagram integration.
+What I'm listening tool for Instagram. AKA: YouTube Music integration with Instagram.
 
 ![alt text](https://mytwitchbot.com/images/recentlyPlayedCC.jpg)
 
