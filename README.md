@@ -23,6 +23,6 @@ What I'm listening tool for Instagram. AKA: YouTube Music integration with Insta
 
 ![alt text](https://mytwitchbot.com/images/console.png)
 
-*If you want to make it cooler, set your Instagram status as "🎵 Recently played" on your mobile app.*
+*If you want to make it looks cooler, set your Instagram status as "🎵 Recently played" with your mobile app.*
 
 ![alt text](https://mytwitchbot.com/images/recentlyPlayedAA.jpg)   ![alt text](https://mytwitchbot.com/images/recentlyPlayedBB.jpg)
