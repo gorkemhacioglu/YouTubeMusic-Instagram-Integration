@@ -10,13 +10,15 @@ var loginCookiesPath =
 var nowListening = "";
 var previousSong = "";
 
+var chromePath = @"C:\Program Files\Google\Chrome\Application\chrome.exe";
+
 var driverService = ChromeDriverService.CreateDefaultService();
 driverService.HideCommandPromptWindow = true;
-
 var chromeOptions = new ChromeOptions {AcceptInsecureCertificates = true};
-
-var driver = new ChromeDriver(driverService, chromeOptions)
-    {Url = "https://www.instagram.com/accounts/edit/"};
+chromeOptions.BinaryLocation = chromePath;
+Console.WriteLine("Initializing Instagram Browser... Please login if required...");
+var driver = new ChromeDriver(driverService, chromeOptions);
+driver.Url = "https://www.instagram.com/accounts/edit/";
 
 var allCookies = GetCookie("cookieInstagram");
 
@@ -28,18 +30,37 @@ if (allCookies != null)
 driver.Navigate().Refresh();
 
 chromeOptions.AddArgument("--remote-debugging-port=9222");
-chromeOptions.AddArgument(@"--user-data-dir=selenium");
-var driverYoutubeChecker = new ChromeDriver(driverService, chromeOptions)
-    {Url = "https://music.youtube.com/history"};
+chromeOptions.AddArgument($"--user-data-dir=C:/Users/{Environment.UserName}/AppData/Local/Google/Chrome/User Data");
 
-allCookies = GetCookie("cookieYoutube");
+ChromeDriver driverYoutubeChecker = null;
 
-if (allCookies != null)
-    foreach (var cookie in allCookies)
-        driverYoutubeChecker.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain,
-            cookie.Path, new DateTime(cookie.Expiry)));
+try
+{
+    Console.WriteLine("Initializing Youtube Music Browser...");
+    
+    driverYoutubeChecker = new ChromeDriver(driverService, chromeOptions)
+        {Url = "https://music.youtube.com/history"};
 
-driverYoutubeChecker.Navigate().Refresh();
+    allCookies = GetCookie("cookieYoutube");
+
+    if (allCookies != null)
+        foreach (var cookie in allCookies)
+            driverYoutubeChecker.Manage().Cookies.AddCookie(new Cookie(cookie.Name, cookie.Value, cookie.Domain,
+                cookie.Path, new DateTime(cookie.Expiry)));
+
+    driverYoutubeChecker.Navigate().Refresh();
+}
+catch (WebDriverArgumentException e)
+{
+    driverYoutubeChecker?.Close();
+    driver.Close();
+    Console.WriteLine("WARNING---------");
+    Console.WriteLine("Close all Chrome tabs to run this app.");
+    Console.WriteLine("----------------");
+    Console.ReadLine();
+}
+
+Console.WriteLine("Working...");
 
 while (true)
 {
@@ -53,7 +74,7 @@ while (true)
     }
     catch (Exception e)
     {
-        Console.WriteLine(e);
+        //ignored
     }
 
     Console.ReadLine();
@@ -80,7 +101,7 @@ void CheckCurrentSong()
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                //ignored
             }
             
             IWebElement singer = null;
@@ -92,7 +113,7 @@ void CheckCurrentSong()
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                //ignored
             }
 
             try
@@ -102,18 +123,20 @@ void CheckCurrentSong()
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                //ignored
             }
             
             if (!string.IsNullOrEmpty(songName?.Text) && !string.IsNullOrEmpty(singer?.Text))
             {
+                Console.WriteLine(nowListening);
+
                 nowListening = songName?.Text + " - " + singer?.Text.Replace(Environment.NewLine, " ");
                 driverYoutubeChecker.Navigate().Refresh();
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            //ignored
         }
 
         Thread.Sleep(10000);
@@ -144,6 +167,7 @@ void UpdateLiveSong()
                 {
                     continue;
                 }
+                Console.WriteLine("Setting " + nowListening + " on bio.");
 
                 description.Clear();
                 description.SendKeys(nowListening);
@@ -157,7 +181,7 @@ void UpdateLiveSong()
         }
         catch (Exception e)
         {
-            Console.WriteLine(e);
+            //ignored
         }
 
         Thread.Sleep(10000);
