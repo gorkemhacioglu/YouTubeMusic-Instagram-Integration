@@ -20,3 +20,7 @@ What I'm listening tool for Instagram. AKA YouTube Music - Instagram integration
 7- It will read from your YouTube Music History and will set it on Instagram bio.
 
 ![alt text](https://mytwitchbot.com/images/console.png)
+
+*If you want to make it cooler, set your Instagram status as 🎵 Recently played*
+
+![alt text](https://mytwitchbot.com/images/RecentlyPlayedA.jpg)   ![alt text](https://mytwitchbot.com/images/RecentlyPlayedB.jpg)
