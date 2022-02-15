@@ -131,7 +131,6 @@ void CheckCurrentSong()
                 Console.WriteLine(nowListening);
 
                 nowListening = songName?.Text + " - " + singer?.Text.Replace(Environment.NewLine, " ");
-                driverYoutubeChecker.Navigate().Refresh();
             }
         }
         catch (Exception e)
@@ -140,6 +139,7 @@ void CheckCurrentSong()
         }
 
         Thread.Sleep(10000);
+        driverYoutubeChecker.Navigate().Refresh();
     }
 }
 
