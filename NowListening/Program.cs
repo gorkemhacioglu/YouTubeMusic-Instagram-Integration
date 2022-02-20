@@ -138,8 +138,15 @@ void CheckCurrentSong()
             //ignored
         }
 
-        Thread.Sleep(10000);
-        driverYoutubeChecker.Navigate().Refresh();
+        try
+        {
+            Thread.Sleep(10000);
+            driverYoutubeChecker.Navigate().Refresh();
+        }
+        catch (Exception e)
+        {
+            //ignored
+        }
     }
 }
 
