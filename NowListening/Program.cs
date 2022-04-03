@@ -50,7 +50,7 @@ try
 
     driverYoutubeChecker.Navigate().Refresh();
 }
-catch (WebDriverArgumentException e)
+catch
 {
     driverYoutubeChecker?.Close();
     driver.Close();
@@ -72,7 +72,7 @@ while (true)
         var b = new Thread(CheckCurrentSong);
         b.Start();
     }
-    catch (Exception e)
+    catch
     {
         //ignored
     }
@@ -99,7 +99,7 @@ void CheckCurrentSong()
                 songName = driverYoutubeChecker.FindElement(By.XPath(
                     "/html/body/ytmusic-app/ytmusic-app-layout/div[3]/ytmusic-browse-response/ytmusic-section-list-renderer/div[2]/ytmusic-shelf-renderer[1]/div[2]/ytmusic-responsive-list-item-renderer[1]/div[2]/div[1]/yt-formatted-string/a"));
             }
-            catch (Exception e)
+            catch
             {
                 //ignored
             }
@@ -111,7 +111,7 @@ void CheckCurrentSong()
                 singer = driverYoutubeChecker.FindElement(By.XPath(
                     "/html/body/ytmusic-app/ytmusic-app-layout/div[3]/ytmusic-browse-response/ytmusic-section-list-renderer/div[2]/ytmusic-shelf-renderer[1]/div[2]/ytmusic-responsive-list-item-renderer[1]/div[2]/div[3]/yt-formatted-string[1]/a"));
             }
-            catch (Exception e)
+            catch
             {
                 //ignored
             }
@@ -121,7 +121,7 @@ void CheckCurrentSong()
                 singer = driverYoutubeChecker.FindElement(By.XPath(
                     "/html/body/ytmusic-app/ytmusic-app-layout/div[3]/ytmusic-browse-response/ytmusic-section-list-renderer/div[2]/ytmusic-shelf-renderer[1]/div[2]/ytmusic-responsive-list-item-renderer[1]/div[2]/div[3]/yt-formatted-string[1]"));
             }
-            catch (Exception e)
+            catch
             {
                 //ignored
             }
@@ -133,7 +133,7 @@ void CheckCurrentSong()
                 nowListening = songName?.Text + " - " + singer?.Text.Replace(Environment.NewLine, " ");
             }
         }
-        catch (Exception e)
+        catch
         {
             //ignored
         }
@@ -141,9 +141,9 @@ void CheckCurrentSong()
         try
         {
             Thread.Sleep(10000);
-            driverYoutubeChecker.Navigate().Refresh();
+            driverYoutubeChecker?.Navigate().Refresh();
         }
-        catch (Exception e)
+        catch
         {
             //ignored
         }
@@ -186,7 +186,7 @@ void UpdateLiveSong()
                 submit.Click();
             }
         }
-        catch (Exception e)
+        catch
         {
             //ignored
         }
