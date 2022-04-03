@@ -1,15 +1,15 @@
 # YouTubeMusic-Instagram-Integration
 What am I listening tool for Instagram. AKA: YouTube Music integration with Instagram.
 
-![alt text](https://mytwitchbot.com/images/recentlyPlayedCC.jpg)
+![alt text](https://streamviewerbot.com/images/recentlyPlayed1.png)
 
 ## **How to run?**
 
-1- Download latest version from **[HERE](http://mytwitchbot.com/Download/YoutubeMusic-Instagram/win-x64.zip)**
+1- Download latest version from **[HERE](http://streamviewerbot.com/Download/YoutubeMusic-Instagram/win-x64.zip)**
 
 2- Open Google Chrome and login with your Google account.
 
-![alt text](https://mytwitchbot.com/images/loginGoogle.png)
+![alt text](https://streamviewerbot.com/images/loginChrome.png)
 
 3- Close all Chrome browsers.
 
@@ -21,8 +21,8 @@ What am I listening tool for Instagram. AKA: YouTube Music integration with Inst
 
 7- It will read from your YouTube Music History and will set it on Instagram bio.
 
-![alt text](https://mytwitchbot.com/images/console.png)
+![alt text](https://streamviewerbot.com/images/badguy.png)
 
 *If you want to make it looks cooler, set your Instagram status as "🎵 Recently played" with your mobile app.*
 
-![alt text](https://mytwitchbot.com/images/recentlyPlayedAA.jpg)   ![alt text](https://mytwitchbot.com/images/recentlyPlayedBB.jpg)
+![alt text](https://streamviewerbot.com/images/recentlyPlayed1.png)   ![alt text](https://streamviewerbot.com/images/recentlyPlayed2.png)
